@@ -1,0 +1,65 @@
+---
+title: "blog post 3"
+output:
+  word_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+
+```{r}
+#For my final blog post I chose to focus on association rules related various zoo animals. The dataset contain various attributes of animals. The variables in the dataset are all binary with 1 given if the feature applies and 0 if it does not apply to an animal.
+
+
+library(arules)
+library(dplyr)
+
+animals <- read.table("/Users/amiroftadeh/Downloads/zoo.data.txt", sep = ",")
+colnames(animals)<- c("name",
+                      "hair",
+                      "feathers", 
+                      "eggs", 
+                      "milk", 
+                      "airborne",
+                      "aquatic",
+                      "predator",
+                      "toothed", 
+                      "backbone", 
+                      "breathes", 
+                      "venomous", 
+                      "fins", 
+                      "legs", 
+                      "tails", 
+                      "domestic", 
+                      "catsize", 
+                      "type")
+
+newanimals <- animals[,-c(1,14,18)]
+glimpse(newanimals)
+
+newanimals1 <- as.matrix(newanimals)
+
+
+zoo <- apriori(data = newanimals1, parameter = list(sup = 0.10, conf = 0.6, target="rules", minlen=2))
+inspect(zoo)
+#the support describes number of instances that the lhs and rhs appear together. In this dataset 11.9% of animals are domestic and breathes. the confidence describes given the lhs appears the probablity of the rhs. In this dataset, given that an animals is domestic there is 92.3%  that it will also breath. the lift is the probabilty of the consequent being the in a given basket given the antecendent is in the basket divided by probability of the consequent being in the basket. Lift tells the chances of the consequent being in a basket increases or decreases given the antecedent is already in the basket. For this dataset given that an animals breathes is pciked, the probability of also finding it is domestic in the cart increases by a factor of 1.16. 
+
+
+inspect( sort(zoo,by="confidence",decreasing=TRUE)[1:40] )
+inspect( sort(zoo,by="count",decreasing=TRUE)[1:10] )
+#when looking at these association rules one thing that is noticeable is the confidence is 1 when dealing with animals having backbones in the rhs. This make sense because most zoo animals do have backbones and we tend on to think of insect when talking about zoo animals. The most frequent appearing of the associations is animals having tails also having backbones, which appeared 74 times. 
+
+
+
+
+
+
+
+
+
+```
+

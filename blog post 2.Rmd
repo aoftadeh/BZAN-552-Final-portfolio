@@ -1,0 +1,93 @@
+---
+title: "R Notebook"
+output: html_notebook
+editor_options: 
+  chunk_output_type: inline
+---
+
+
+
+```{r}
+#For this post I chose to do kmeans clustering on a dataset related to country flags. In the data was information related each country's population, area, location. languages , and religion. Then dummy variables were introduced for colors present on the flag. Dummy variables were introduced on whether a flag has features like stars, bars, words and various shapes. 
+
+library(dplyr)
+library(cluster)
+
+
+
+
+flags <-read.table("/Users/amiroftadeh/Downloads/flag.data.txt",sep =",")
+colnames(flags)<- c("name",
+                    "landmass",
+                    "zone","area",
+                    "population","
+                    language",
+                    "religion",
+                    "bars",
+                    "stripes",
+                    "colours",
+                    "red",
+                    "green",
+                    "blue",
+                    "gold",
+                    " white",
+                    "black",
+                    "orange",
+                    "mainhue",
+                    "circles",
+                    "crosses",
+                    "saltires",
+                    "quarters",
+                    "sunstars",
+                    "crescent",
+                    "triangle,",
+                    "icon",
+                    "animate",
+                    "text",
+                    "topleft",
+                    "botright")
+
+
+
+fit1 <- kmeans(as.matrix(flags[,c(4:5,8:17,19:28)]), 3) #removed catergorical variables
+
+(fit1$centers)
+(fit1$cluster)
+(fit1$totss)
+
+clusplot(flags, fit1$cluster, color=TRUE, shade=TRUE, 
+  	labels=2, lines=0)
+
+#identfy optimal number of clusters
+
+SSEs <- rep(NA,10) 
+SSEs[1] <- fit1$totss 
+for(k in 2:10){
+	fit <- kmeans(flags[,c(4:5,8:17,19:28)],k)
+	SSEs[k] <- fit$tot.withinss
+}
+par(mar=c(4,4,1,1))
+
+plot(1:10,SSEs,type="b",xlab="Number of Clusters")
+#After looking at the plot 3 clusters would be best. Adding more clusters would have very little further impact after 3.
+
+flags$cluster<- fit1$cluster
+
+#summary of clusters based on centers
+(fit1$centers)
+
+
+#cluster 1
+#the countries in this cluster are fairly small countries in terms of area and population, this in between cluster 2 and 3. The flags within cluster are more likely than to contain bars, and have a greater proportion of flags that contain bars as compared those in cluster 2 or 3. These flags contain more green in this cluster than any of the other one. The flags in this cluster are more likely than to contain the colors red and green. This cluster is last among flags containing blue
+
+#cluster 2
+#the countries in this cluster are by far the smallest in terms of area and population. The flags in this cluster contain the most number of color on their flags. They also have they highest levels of blue, white, and black compared to the other clusters.
+
+#cluster 3
+#the flags in cluster 3 are countries have both the largest area and population. The flags have fewest number of colors. The flags have lowest amount of bars but the greatest number of stripes. The flags in this cluster have the greatest amount of red and blue compared to the other clusters. This cluster also contains no flags with black or orange. The flags also have the greatest amount of text compared to the 2 other clusters. 
+
+
+
+```
+
+
